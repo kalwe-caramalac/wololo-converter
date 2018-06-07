@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function check {
+  if [[ ! "$(command -v composer)" ]]; then
+    echo "Composer not installed."
+    echo "use this command below to do it"
+    echo -e "\tcurl -sS https://getcomposer.org/installer | php"
+    if [[ "$(command -v php --version)" ]]; then
+      echo "Install PHP >= 7.1 before go ahead and after that install composer"
+      exit 1
+    fi
+    exit 1
+  else
+    return 0
+  fi
+}
+
+function install {
+  composer install
+  chmod +x ./scripts/*.sh
+  mkdir bin
+}
+
+if check; then
+  echo "Conversor ver. 0.0.1-ALFA"
+  install && \
+  echo "Installed"
+fi

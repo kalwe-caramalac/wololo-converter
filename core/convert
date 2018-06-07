@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+
+<?php
+
+include __DIR__ . "/../vendor/autoload.php";
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+// use Core\Conversor\;
+include __DIR__ . "/conversor.php";
+
+(new Application('convert', '0.0.1@baby'))
+    ->register('convert')
+    ->setDescription('Convert o \'encode\' do projeto \'Syscor\' para UNICODE.')
+    ->addArgument(
+        'conversivel',
+        InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+        "Indica quem sera convertido code|database"
+    )->addOption(
+        'input-path', null,
+        InputOption::VALUE_OPTIONAL,
+        'Path do projeto para conversao'
+    )->addOption(
+        'output-path', null,
+        InputOption::VALUE_OPTIONAL,
+        'Output path do projeto convertido'
+    )->addOption(
+        'database-name', null,
+        InputOption::VALUE_OPTIONAL,
+        'Indica o nome do banco de dados para conversao',
+        'syscor'
+    )->addOption(
+        'encode-type', null,
+        InputOption::VALUE_OPTIONAL,
+        'Tipo de encode para converter o projeto',
+        'utf-8'
+    )->addOption(
+        'flag', null,
+        InputOption::VALUE_OPTIONAL,
+        'Marca com uma tag as linhas modificadas. (Não implementado até agora.)',
+        '#ALTERED'
+    )
+    ->setCode(function(InputInterface $input, OutputInterface $output) {
+
+        $io = new SymfonyStyle($input, $output);
+
+        $gabrieleAmorth = new Padre([
+            'io'            => $io,
+            'input_path'    => $input->getOption("input-path"),
+            'output_path'   => $input->getOption("output-path"),
+            'database_name' => $input->getOption("database-name"),
+            'encode_type'   => $input->getOption("encode-type"),
+            'conversivel'         => $input->getArgument("conversivel")
+        ]);
+
+        $gabrieleAmorth->converter(); // Ayo Wololooo, Wololooo...!!!
+    })
+    ->getApplication()
+    ->setDefaultCommand('convert', true)
+    ->run();
