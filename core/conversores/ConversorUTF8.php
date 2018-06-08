@@ -62,7 +62,7 @@ class ConversorUTF8
 
     private function arrangeOutput() {
 
-        $this->io->section("Arrange Output");
+        $this->io->text("Arrange Output...");
 
         $path = $this->outputPath;
         if (is_dir($path))
@@ -176,10 +176,6 @@ class ConversorUTF8
                 $line = $tmp;
             }
 
-            // $line .= " // #ALTERED#";
-            // echo "flag #ALTERED#: " . $line . "\n"; # em teste...
-            // echo "line 1A: " . $line . "\n"; # debug only
-
         } else if ($pregRes >= 2) {
 
             $pttr = "/utf8_(encode|decode)\(((.)+)\)/i";
@@ -191,12 +187,6 @@ class ConversorUTF8
 
             $line = preg_replace($pttr, $matches[2], $line);
         }
-
-        # isso funciona mas com limitacoes
-        // $pattern = "/utf8_(encode|decode)/";
-        // if (preg_match_all($pattern, $line)) {
-        //     $line = preg_replace($pattern, "", $line);
-        // }
 
         return $line;
     }
@@ -242,25 +232,50 @@ class ConversorUTF8
 
     private function treat_mb_convert_encoding(String $line) {
 
-        # VALIDAR: o uso da func mb_convert_encoding
+        $pttHead = "/mb_convert_encoding\(/";
+        $pttTail = "/, 'ISO-8859-1', 'UTF-8'\)/";
 
-        $pattern = "/mb_convert_encoding\(/";
-        $pregRes = preg_match_all($pattern, $line);
-
-        if ($pregRes == 1) {
-            echo "mb_converter " . $line;
+        if (preg_match_all($pttHead, $line) && preg_match_all($pttTail, $line)) {
+            $tmp = preg_replace($pttHead, "", $line, 1);
+            $tmp = preg_replace($pttTail, "", $tmp, 1);
+            $line = $tmp;
         }
+        return $line;
     }
 
-    private function changeWrongEncode($line) {}
+    private function changeEncode($line, $encodeFrom = 'iso-8859-1', $encodeTo = 'UTF-8') {
+
+        $ptt = "/{$encodeFrom}/i";
+
+        if (preg_match($ptt, $line) && !preg_match("/^#/", $line)) {
+
+            if (preg_match("/html_entity_decode/", $line)) { # TODO:
+                $line = preg_replace("/, \"iso-8859-1\"/", "", $line);
+            } elseif (preg_match("/mb_convert_encoding/", $line)) {
+                if (preg_match("/, 'UTF-8', 'ISO-8859-1'/", $line)) {
+                    $line = preg_replace("/mb_convert_encoding\(/", "", $line, 1);
+                    $line = preg_replace("/, 'UTF-8', 'ISO-8859-1'\)/", "", $line, 1);
+                } else if (preg_match("/, \"ISO-8859-1\", \"UTF-8\"/", $line)) {
+                    $line = preg_replace("/mb_convert_encoding\(/", "", $line, 1);
+                    $line = preg_replace("/, \"ISO-8859-1\", \"UTF-8\"\)/", "", $line, 1);
+                }
+            } elseif (preg_match("/mb_strtoupper/", $line)) { # TODO:
+                $line = preg_replace("/, 'ISO-8859-1'/", "", $line);
+            } else if(preg_match("/CharSet\s=/", $line)) {
+                $line = preg_replace("/iso-8859-1/", "utf-8", $line, 1);
+            }
+        }
+        return $line;
+    }
 
     private function applyChangesInLine(String $line) {
         if ($line) {
             $line = $this->changeCharsetEncode($line);
             $line = $this->removeUtf8EncodeDecode($line);
             $line = $this->removeArrayIsoToUtf8Calls($line);
-            $line = $this->changeWrongEncode($line);
-            // $line = $this->treat_mb_convert_encoding($line);
+            $line = $this->treat_mb_convert_encoding($line);
+            $line = $this->changeEncode($line);
+            // $line = $this->removeLatin1($line);
         }
         return $line;
     }
@@ -270,10 +285,8 @@ class ConversorUTF8
         $outputFilePath = $this->ajustPath($fileName);
         if ($fileToWrite = fopen($outputFilePath, 'a')) {
             if (is_writable($outputFilePath)) {
-                // fwrite($fileToWrite, utf8_encode($data)); # magic
                 fwrite($fileToWrite, mb_convert_encoding($data, self::DEFOUT_ENCODE, self::DEFIN_ENCODE));
             }
-
             fclose($fileToWrite); # FIXME: da pra otimiza essa abertura e fexamento de arquivo
         }
     }
@@ -292,7 +305,6 @@ class ConversorUTF8
         $patternToIgnore = "/\.(jpg|jpeg|png|gif|svg|woff|woff2|eot|ttf)/";
         $pregRes = preg_match_all($patternToIgnore, $pathToFileName);
         if ($pregRes == 0) {
-            // echo $pathToFileName . "\n";
             if (is_readable($pathToFileName)) {
                 if ($file = fopen($pathToFileName, 'r')) {
                     while (!feof($file)) {
@@ -413,13 +425,14 @@ class ConversorUTF8
 
     public function executeConversionProcedures($args) { # realiza cerimonia
         $this->io->section("Execute Conversion Procedures");
-
-        // $this->loadProject();
         $this->arrangeOutput();
         $this->cloneDirectoryTree($this->inputPath);
+        $this->io->text("  \n  Converting files, please wait...!!!\n");
         $this->processFiles($this->inputPath);
+        $this->io->text("Done!\n");
         $this->reapsRest();
         $this->removeUselessFilesAndFolders(); # must be one of last act...
         // $this->polishingConvertedProject();
+        echo "\n";
     }
 }

@@ -1,5 +1,3 @@
-#!/usr/bin/env php
-
 <?php
 
 // require __DIR__ . "/../vendor/autoload.php";
@@ -26,7 +24,7 @@ class Padre
         $this->io = $this->args->io;
         $this->conversivel = $this->args->conversivel;
 
-        $this->escolheConversor();
+        $this->chooseConversor();
     }
 
     public function converter() {
@@ -34,7 +32,7 @@ class Padre
         $this->conversor->executeConversionProcedures($this->args);
     }
 
-    private function escolheConversor() {
+    private function chooseConversor() {
         $conversor = NULL;
         if ($this->conversivel[0] == "code")
             $conversor = new ConversorUTF8($this->args);
