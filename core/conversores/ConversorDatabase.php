@@ -17,7 +17,7 @@ class ConversorDatabase
     const DATABASE_TIMEOUT  = 60 * 60 * 16;
 
     private $encode     = "utf8";
-    private $encode_ext = "utf8_unicode_ci";
+    private $encode_ext = "utf8_general_ci"; # latin1_swedish_ci
 
     private $pdo;
 
@@ -37,15 +37,15 @@ class ConversorDatabase
     }
 
     private function buildPDO($args) {
-        $dsn = "mysql:host={$args->database_host};" .
-               "port={$args->database_port};" .
-               "dbname={$args->database_name}";
+        $dsn = "mysql:host={$args->host};" .
+               "port={$args->port};" .
+               "dbname={$args->dbname}";
 
         // $dsn = "mysql:host=127.0.0.1;" .
         //        "port=11001;" .
         //        "dbname=syscor";
 
-        $this->pdo = new PDO($dsn, $args->database_user, $args->database_password, [
+        $this->pdo = new PDO($dsn, $args->user_name, $args->password, [
                 PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_OBJ,
                 PDO::ATTR_TIMEOUT               => self::DATABASE_TIMEOUT
@@ -56,22 +56,6 @@ class ConversorDatabase
         //             PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_OBJ,
         //             PDO::ATTR_TIMEOUT               => self::DATABASE_TIMEOUT
         //         ]);
-    }
-
-    public function preparaConversao() {
-        $this->io->section("Preparando converção do banco de dados...");
-        // $this->sweepTablesInDatabase();
-        // $this->sweepFieldsInTable("uf");
-        $this->listDatabases();
-    }
-
-    public function executeConversionProcedures($args) {
-        $this->io->section("Database Wololo!!!");
-        $this->convertDatabase();
-    }
-
-    private function convertDatabase() {
-        $this->executeScripts();
     }
 
     private function listDatabases() {
@@ -89,6 +73,24 @@ class ConversorDatabase
             var_dump($database, 1);
         }
     }
+
+    public function preparaConversao() {
+        $this->io->section("Prepering to convert database...");
+        // $this->sweepTablesInDatabase();
+        // $this->sweepFieldsInTable("uf");
+        $this->listDatabases();
+    }
+
+    public function executeConversionProcedures($args) {
+        $this->io->section("Database Wololo!!!");
+        $this->convertDatabase();
+    }
+
+    private function convertDatabase() {
+        $this->executeScripts();
+    }
+
+
 
     private function setDatabaseDefaultCharSetEncode($dbname) {
 
