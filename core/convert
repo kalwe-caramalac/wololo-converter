@@ -16,7 +16,7 @@ include __DIR__ . "/conversor.php";
 
 (new Application('convert', '0.0.1@baby'))
     ->register('convert')
-    ->setDescription('Convert o \'encode\' do projeto \'Syscor\' para UNICODE.')
+    ->setDescription('Convert the \'encode\' of one project to UNICODE.')
     ->addArgument(
         'conversivel',
         InputArgument::IS_ARRAY | InputArgument::REQUIRED,
@@ -33,14 +33,14 @@ include __DIR__ . "/conversor.php";
         'host', null,
         InputOption::VALUE_OPTIONAL,
         'Host to database instance',
-        '127.0.0.1'
+        'localhost'
     )->addOption(
         'port', null,
         InputOption::VALUE_OPTIONAL,
         'Database port',
-        '3306'
+        '11001'
     )->addOption(
-        'user-name', null,
+        'username', null,
         InputOption::VALUE_OPTIONAL,
         'Database username',
         'root'
@@ -70,9 +70,9 @@ include __DIR__ . "/conversor.php";
             'output_path'   => $input->getOption("output-path"),
             'host'          => $input->getOption("host"),
             'port'          => $input->getOption("port"),
-            'user_name'     => $input->getOption("user-name"),
+            'user_name'     => $input->getOption("username"),
             'password'      => $input->getOption("password"),
-            'dbname' => $input->getOption("database-name"),
+            'dbname'        => $input->getOption("database-name"),
             'encode_type'   => $input->getOption("encode-type"),
             'conversivel'   => $input->getArgument("conversivel")
         ]);

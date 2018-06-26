@@ -1,4 +1,4 @@
 Convesor de encoding para código e banco de dados
-Usa a lib Symfony/Console para criar um cli que recebe os parametros para converter
+Usa a lib Symfony/Console para criar um 'cli' que recebe os parametros para converter
 Para instalar execute os comandos:
-    chmod +x ./scripts/install && ./scripts/install
+    chmod +x ./install.sh && ./install.sh

@@ -1,7 +1,6 @@
 <?php
 
 // require __DIR__ . "/../vendor/autoload.php";
-
 // use Core\ConversorUTF8;
 
 include __DIR__ . "/conversores/ConversorUTF8.php";
@@ -28,7 +27,7 @@ class Padre
     }
 
     public function converter() {
-        $this->conversor->preparaConversao();
+        $this->conversor->prepareConversion();
         $this->conversor->executeConversionProcedures($this->args);
     }
 

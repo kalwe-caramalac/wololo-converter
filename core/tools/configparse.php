@@ -10,7 +10,7 @@ function loadDSN() {
             while (!feof($handle)) {
                 $line = fgets($handle);
                 if (preg_match("//", $line)) {
-
+                    // statments
                 }
             }
         }

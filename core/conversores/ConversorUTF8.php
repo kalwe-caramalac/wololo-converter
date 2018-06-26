@@ -2,9 +2,6 @@
 
 // namespace Core\ConversorUTF8;
 
-// use Core\Conversor\Conversor;
-// include __DIR__ . "/Conversor.php";
-
 class ConversorUTF8
 {
     const DEFOUTPUT_PATH    = "converted_code";
@@ -33,7 +30,7 @@ class ConversorUTF8
             $str = substr_replace($str, "", $lastPos);
     }
 
-    public function preparaConversao() {
+    public function prepareConversion() {
 
         $this->io->section("Preparing to conversion...");
         $this->io->text("Ajust input/ouput paths...");
@@ -66,7 +63,7 @@ class ConversorUTF8
 
         $path = $this->outputPath;
         if (is_dir($path))
-            `rm -rf {$path}`; # remove trash
+            `rm -rf {$path}`; # avoid previous trash
 
         if (!is_dir($path)) {
             if (mkdir($path, 0777, TRUE)) {
@@ -93,8 +90,6 @@ class ConversorUTF8
             exit(0);
         }
 
-        // FIXME: 'docker' ta removendo o 'script/docker' tbm...eu n kero isso
-        // ps: alterar para data funciona, porem exclui em '/_sys/classes/libs/PHPExcel/Examples/data'
         $foldersToExclude = [".", "..", ".git", ".vscode", "vendor", "dumps",
                            "data", ".sass-cache", "nbproject", "vivo"];
 
@@ -249,7 +244,7 @@ class ConversorUTF8
 
         if (preg_match($ptt, $line) && !preg_match("/^#/", $line)) {
 
-            if (preg_match("/html_entity_decode/", $line)) { # TODO:
+            if (preg_match("/html_entity_decode/", $line)) {
                 $line = preg_replace("/, \"iso-8859-1\"/", "", $line);
             } elseif (preg_match("/mb_convert_encoding/", $line)) {
                 if (preg_match("/, 'UTF-8', 'ISO-8859-1'/", $line)) {
@@ -259,7 +254,7 @@ class ConversorUTF8
                     $line = preg_replace("/mb_convert_encoding\(/", "", $line, 1);
                     $line = preg_replace("/, \"ISO-8859-1\", \"UTF-8\"\)/", "", $line, 1);
                 }
-            } elseif (preg_match("/mb_strtoupper/", $line)) { # TODO:
+            } elseif (preg_match("/mb_strtoupper/", $line)) {
                 $line = preg_replace("/, 'ISO-8859-1'/", "", $line);
             } else if(preg_match("/CharSet\s=/", $line)) {
                 $line = preg_replace("/iso-8859-1/", "utf-8", $line, 1);
@@ -287,7 +282,7 @@ class ConversorUTF8
             if (is_writable($outputFilePath)) {
                 fwrite($fileToWrite, mb_convert_encoding($data, self::DEFOUT_ENCODE, self::DEFIN_ENCODE));
             }
-            fclose($fileToWrite); # FIXME: da pra otimiza essa abertura e fexamento de arquivo
+            fclose($fileToWrite); # FIXME:
         }
     }
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+dirn=`dirname $(readlink -f wololo)`
+bash ${dirn}/scripts/wololo.sh ${@}
